@@ -57,7 +57,7 @@ export function activate(context: vscode.ExtensionContext) {
             // Write the response back to the file
             if (response) {
                 editor.edit(editBuilder => {
-                    editBuilder.insert(new vscode.Position(document.lineCount, 0), `\n\n## ChatGPT Response:\n${response}\n\n## My question`);
+                    editBuilder.insert(new vscode.Position(document.lineCount, 0), `\n\n## ChatGPT Response:\n${response}\n\n## My question:\n`);
                 });
             }
 			else{
@@ -69,30 +69,41 @@ export function activate(context: vscode.ExtensionContext) {
         }
     });
 	async function sendToChatGPT(content: string): Promise<string | null> {
-		const apiKey = "replace with apiKey"; // Replace with your OpenAI API key
+		//const apiKey = "sk-**..."; // Replace with your OpenAI API key
 		
 		try {
 			const response = await axios.post('https://api.openai.com/v1/chat/completions', {
-				prompt: content,
-				max_tokens: 150, // Adjust the number of tokens as per your requirement
-				n: 1,
-				stop: null,
-				temperature: 0.7,
+				model: 'gpt-4', // Specify the correct model
+				messages: [{"role": "user", "content": content}],
+				max_tokens: 150
+
 			}, 
 			{
 				headers: {
-					'Content-Type': 'application/json',
-					'Authorization': `Bearer ${apiKey}`
+					'Authorization': 'Bearer REPLACE WITH YOUR API KEY',
+					'Content-Type': 'application/json'
 				}
 			});
 			if (response.data && response.data.choices && response.data.choices.length > 0) {
-				return response.data.choices[0].text.trim();
+				//return response.request.choices[0].message.content;
+				return response.data.choices[0].message.content;//.data.choices[0].text;//.data.choices[0].text.trim();
 			}
-			return "1";
-		} catch (error) {
-			
-			vscode.window.showErrorMessage('Error communicating with ChatGPT: ');
+			//return "1";
 		}
+		catch (error) {
+			if (axios.isAxiosError(error)) {
+				console.error('Error response:', error.response?.data);
+			}
+			else {
+				console.error('Unexpected error:', error);
+			}
+			throw error;
+		}
+		// catch (error) {
+		// 	console.error("there was an error", error);
+		// 	throw error;
+		// 	//vscode.window.showErrorMessage('Error communicating with ChatGPT: ', error);
+		// }
 	
 		return null;
 	}
