@@ -20,6 +20,10 @@
       {
         "command": "cligpt.send",
         "title": "cligptPush"
+      },
+      {
+        "command": "cligpt.commit",
+        "title": "cligptCommit"
       }
     ]
   },

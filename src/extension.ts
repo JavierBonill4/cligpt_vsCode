@@ -11,7 +11,15 @@ import axios from 'axios';
 // Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
 	const homeDir = os.homedir();
-	const filePath1 = path.join(homeDir, "Documents/2024/summer_intern/cligpt-output/"); //only will work for specific folder that is no longer my gptlogs folder
+	let crntYear: number = new Date().getFullYear();
+	let crntMonth: number = new Date().getMonth() + 1;
+	
+	const filePath1 = path.join(homeDir, `Documents/GPT-Logs/${crntYear}/2024-${crntMonth}`);
+	if (!fs.existsSync(filePath1)) {
+		// If it doesn't exist, create it
+		fs.mkdirSync(filePath1, {recursive: true});
+	  }
+	//const filePath2 = path.join(homeDir, "Documents/2024/summer_intern/cligpt-output/"); //only will work for specific folder that is no longer my gptlogs folder
 	function generateTimestampedFileName(): string { //generates the filename based on timestamp
 		const timestamp = new Date().toISOString();
 		return `cligpt-${timestamp}.md`;
@@ -20,7 +28,7 @@ export function activate(context: vscode.ExtensionContext) {
 	function createAndWriteToFile(directory: string): string {//creates file using generated timestamp, and writes our info into file
 		const fileName = generateTimestampedFileName();
 		const filePath = path.join(directory, fileName);
-		const message = "role: You are an expert Software Developer\nmodel: gpt-4o\n## My question:\n"
+		const message = "role: You are an expert Software Developer\nmodel: gpt-4\n## Question:\n---------\n"
 	
 		try {
 			fs.writeFileSync(filePath, message, { flag: 'a' });
@@ -57,8 +65,9 @@ export function activate(context: vscode.ExtensionContext) {
             // Write the response back to the file
             if (response) {
                 editor.edit(editBuilder => {
-                    editBuilder.insert(new vscode.Position(document.lineCount, 0), `\n\n## ChatGPT Response:\n${response}\n\n## My question:\n`);
+                    editBuilder.insert(new vscode.Position(document.lineCount, 0), `\n\n## ChatGPT Response:\n---------\n${response}\n\n## My question:\n---------\n`);
                 });
+				vscode.workspace.saveAll();
             }
 			else{
 				vscode.window.showErrorMessage('No response.');
@@ -68,19 +77,40 @@ export function activate(context: vscode.ExtensionContext) {
             vscode.window.showErrorMessage('No active editor found. Please open a file first.');
         }
     });
+	let GPTfinish = vscode.commands.registerCommand('cligpt.commit', async () => {
+		const editor = vscode.window.activeTextEditor;
+		if(editor){
+			const document = editor.document;
+			let content:string = document.getText();
+			const summary = await sendToChatGPT(content + "give me a 1 sentence summary of this conversation, I want you to make it as short a sentence as possible while still encapsolating the conversation. No more than 25 words but ideally less, and it doesnt have to be a pretty complete sentence as long as I can understand the gist");
+			if (summary){
+				editor.edit(editBuilder => {
+					var totalLines = editor.document.lineCount;
+					var start = new vscode.Position(totalLines - 3, 0); 
+					var end = new vscode.Position(totalLines, 0); 
+    				var rangeToDelete = new vscode.Range(start, end);
+					editBuilder.delete(rangeToDelete);
+                    editBuilder.insert(new vscode.Position(document.lineCount, 0), `## Summary:\n${summary}`);
+                });
+				vscode.workspace.saveAll();
+			}
+		}
+	});
+         
 	async function sendToChatGPT(content: string): Promise<string | null> {
-		//const apiKey = "sk-**..."; // Replace with your OpenAI API key
-		
+		const apiKey = 'MY_API_KEY';//process.env.OPENAI_API_KEY; 
+		let auth: string = 'Bearer ' + apiKey;
+		// const api_key = process.env.OPENAI_APIKEY;
+		// vscode.window.showInformationMessage(api_key);
 		try {
 			const response = await axios.post('https://api.openai.com/v1/chat/completions', {
 				model: 'gpt-4', // Specify the correct model
 				messages: [{"role": "user", "content": content}],
-				max_tokens: 150
-
+				max_tokens: 250
 			}, 
 			{
 				headers: {
-					'Authorization': 'Bearer REPLACE WITH YOUR API KEY',
+					'Authorization': auth,
 					'Content-Type': 'application/json'
 				}
 			});
@@ -116,7 +146,7 @@ export function activate(context: vscode.ExtensionContext) {
 		//vscode.window.showInformationMessage('Hello World from cligpt!');
 	});
 
-	context.subscriptions.push(createAndOpenFile, sendToChatGPTCommand);
+	context.subscriptions.push(createAndOpenFile, sendToChatGPTCommand, GPTfinish);
 }
 
 // This method is called when your extension is deactivated
