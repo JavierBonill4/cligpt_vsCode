@@ -6,6 +6,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
 import axios from 'axios';
+import {config} from './config';
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
@@ -98,13 +99,15 @@ export function activate(context: vscode.ExtensionContext) {
 	});
          
 	async function sendToChatGPT(content: string): Promise<string | null> {
-		const apiKey = 'APIKEY';//process.env.OPENAI_API_KEY; 
+		const apiKey: string = config.apiKey;
+		const model: string = config.model;
+		//const apiKey = 'APIKEY';//process.env.OPENAI_API_KEY; 
 		let auth: string = 'Bearer ' + apiKey;
 		// const api_key = process.env.OPENAI_APIKEY;
 		// vscode.window.showInformationMessage(api_key);
 		try {
 			const response = await axios.post('https://api.openai.com/v1/chat/completions', {
-				model: 'gpt-4', // Specify the correct model
+				model: model, // Specify the correct model
 				messages: [{"role": "user", "content": content}],
 				max_tokens: 3000
 			}, 
