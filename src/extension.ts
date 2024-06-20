@@ -18,7 +18,7 @@ export function activate(context: vscode.ExtensionContext) {
 	if (!fs.existsSync(filePath1)) {
 		// If it doesn't exist, create it
 		fs.mkdirSync(filePath1, {recursive: true});
-	  }
+	}
 	//const filePath2 = path.join(homeDir, "Documents/2024/summer_intern/cligpt-output/"); //only will work for specific folder that is no longer my gptlogs folder
 	function generateTimestampedFileName(): string { //generates the filename based on timestamp
 		const timestamp = new Date().toISOString();
@@ -98,7 +98,7 @@ export function activate(context: vscode.ExtensionContext) {
 	});
          
 	async function sendToChatGPT(content: string): Promise<string | null> {
-		const apiKey = 'MY_API_KEY';//process.env.OPENAI_API_KEY; 
+		const apiKey = 'APIKEY';//process.env.OPENAI_API_KEY; 
 		let auth: string = 'Bearer ' + apiKey;
 		// const api_key = process.env.OPENAI_APIKEY;
 		// vscode.window.showInformationMessage(api_key);
@@ -106,7 +106,7 @@ export function activate(context: vscode.ExtensionContext) {
 			const response = await axios.post('https://api.openai.com/v1/chat/completions', {
 				model: 'gpt-4', // Specify the correct model
 				messages: [{"role": "user", "content": content}],
-				max_tokens: 250
+				max_tokens: 3000
 			}, 
 			{
 				headers: {
