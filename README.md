@@ -16,8 +16,8 @@ For example if there is an image subfolder under your extension project workspac
 
 ## Requirements
 
-Run `npm install` to install dependencies. The only dependency needed is axios 1.7.2
-Create a config.ts file and add:
+- Run `npm install` to install dependencies. The only dependency needed is axios 1.7.2
+- Create a config.ts file and add:
 ```
 export const config = {
     apiKey: 'REPLACE WITH YOUR OPENAI APIKEY',
@@ -35,6 +35,7 @@ export const config = {
     role: 'You are an expert Software Developer'
 };
 ```
+- In the package.json file, on line 7 change the version of vsCode to be compatable with the version of vsCode you are running
 If you have any requirements or dependencies, add a section describing those and how to install and configure them.
 
 ## Extension Settings
