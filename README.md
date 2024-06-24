@@ -1,6 +1,8 @@
 # cligpt README
-
-This is the README for your extension "cligpt". After writing up a brief description, we recommend including the following sections.
+This is an extension to use openAI's chatGPT through vsCode. This extension will create a file for when you want to ask chatgpt a question, each file logs a conversation and can be stored where you want(recommend a log folder) organized in files by year and month. The fileName is based on the date and time. This extension currently supports 3 commands:
+- cligpt: will create the file and give a space to write a question. Only needs to be called once per conversation
+- cligptPush: Sends the complete file to chatGPT and will print out chatGPT's response. Once one queston is asked a space will be provided to add another question and this command should be run everytime you finish typing a question.
+- cligptCommit: Ends the conversation with a short one sentence summary of the entire conversation.
 
 ## Features
 
@@ -14,6 +16,25 @@ For example if there is an image subfolder under your extension project workspac
 
 ## Requirements
 
+Run `npm install` to install dependencies. The only dependency needed is axios 1.7.2
+Create a config.ts file and add:
+```
+export const config = {
+    apiKey: 'REPLACE WITH YOUR OPENAI APIKEY',
+    model: 'WHAT MODE OF GPT YOU WANT TO USE',
+    location: 'WHERE YOU WANT TO STORE FILES',
+    role: 'ROLE YOU WANT TO GIVE TO CHATGPT'
+};
+```
+here is an example of what it could look like with a fake API key:
+```
+export const config = {
+    apiKey: 'sk-GDNhsveD83b5lsbFh4ns85ns84nwl2lDHY$bwsur4Dfksb&DBhes',
+    model: 'gpt-4',
+    location: 'Documents/GPT_Logs',
+    role: 'You are an expert Software Developer'
+};
+```
 If you have any requirements or dependencies, add a section describing those and how to install and configure them.
 
 ## Extension Settings
@@ -29,7 +50,7 @@ This extension contributes the following settings:
 
 ## Known Issues
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+Once you run cligptPush, it will take some time for chatGPT to give its response, ~5-15 seconds.
 
 ## Release Notes
 

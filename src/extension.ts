@@ -14,22 +14,22 @@ export function activate(context: vscode.ExtensionContext) {
 	const homeDir = os.homedir();
 	let crntYear: number = new Date().getFullYear();
 	let crntMonth: number = new Date().getMonth() + 1;
+	const location = config.location
 	
-	const filePath1 = path.join(homeDir, `Documents/GPT-Logs/${crntYear}/2024-${crntMonth}`);
+	const filePath1 = path.join(homeDir, `${location}/${crntYear}/2024-${crntMonth}`);
 	if (!fs.existsSync(filePath1)) {
 		// If it doesn't exist, create it
 		fs.mkdirSync(filePath1, {recursive: true});
 	}
-	//const filePath2 = path.join(homeDir, "Documents/2024/summer_intern/cligpt-output/"); //only will work for specific folder that is no longer my gptlogs folder
 	function generateTimestampedFileName(): string { //generates the filename based on timestamp
 		const timestamp = new Date().toISOString();
 		return `cligpt-${timestamp}.md`;
 	}
 
-	function createAndWriteToFile(directory: string): string {//creates file using generated timestamp, and writes our info into file
+	function createAndWriteToFile(directory: string): string {//creates file using generated timestamp, and writes our info into filein
 		const fileName = generateTimestampedFileName();
 		const filePath = path.join(directory, fileName);
-		const message = "role: You are an expert Software Developer\nmodel: gpt-4\n## Question:\n---------\n"
+		const message = `role: ${config.role}\nmodel: ${config.model}\n## Question:\n---------\n`;
 	
 		try {
 			fs.writeFileSync(filePath, message, { flag: 'a' });
