@@ -24,6 +24,10 @@
       {
         "command": "cligpt.commit",
         "title": "cligptCommit"
+      },
+      {
+        "command": "cligpt.resume",
+        "title": "cligptResume"
       }
     ]
   },

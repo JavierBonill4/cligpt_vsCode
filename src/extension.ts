@@ -26,7 +26,7 @@ export function activate(context: vscode.ExtensionContext) {
 		return `cligpt-${timestamp}.md`;
 	}
 
-	function createAndWriteToFile(directory: string): string {//creates file using generated timestamp, and writes our info into filein
+	function createAndWriteToFile(directory: string): string {//creates file using generated timestamp, and writes our info into file
 		const fileName = generateTimestampedFileName();
 		const filePath = path.join(directory, fileName);
 		const message = `role: ${config.role}\nmodel: ${config.model}\n## Question:\n---------\n`;
@@ -49,6 +49,10 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 	}
 	let createAndOpenFile = vscode.commands.registerCommand('cligpt.create', async () =>{
+		if (!fs.existsSync(filePath1)) {
+			// If it doesn't exist, create it
+			fs.mkdirSync(filePath1, {recursive: true});
+		}
 		const gptfile = createAndWriteToFile(filePath1);
 		openFileInVSCode(gptfile);
 	});
@@ -95,6 +99,17 @@ export function activate(context: vscode.ExtensionContext) {
                 });
 				vscode.workspace.saveAll();
 			}
+		}
+	});
+	let GPTresume = vscode.commands.registerCommand('cligpt.resume', async () => {
+		const editor = vscode.window.activeTextEditor;
+		if(editor){
+			const document = editor.document;
+			editor.edit(editBuilder => {
+				editBuilder.insert(new vscode.Position(document.lineCount, 0), `\n\n## My question:\n---------\n`);
+			});
+			vscode.workspace.saveAll();
+			vscode.window.showErrorMessage('No response.');	
 		}
 	});
          
@@ -149,7 +164,7 @@ export function activate(context: vscode.ExtensionContext) {
 		//vscode.window.showInformationMessage('Hello World from cligpt!');
 	});
 
-	context.subscriptions.push(createAndOpenFile, sendToChatGPTCommand, GPTfinish);
+	context.subscriptions.push(createAndOpenFile, sendToChatGPTCommand, GPTfinish, GPTresume);
 }
 
 // This method is called when your extension is deactivated
