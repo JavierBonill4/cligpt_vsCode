@@ -18,7 +18,7 @@
         "title": "cligpt"
       },
       {
-        "command": "cligpt.send",
+        "command": "cligpt.push",
         "title": "cligptPush"
       },
       {
@@ -28,6 +28,14 @@
       {
         "command": "cligpt.resume",
         "title": "cligptResume"
+      },
+      {
+        "command": "cligpt.find",
+        "title": "cligptFind"
+      },
+      {
+        "command": "cligpt.send",
+        "title": "cligptSend"
       }
     ]
   },
